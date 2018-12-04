@@ -1,0 +1,63 @@
+﻿<Window x:Class="DesktopApp.MainWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:proj="clr-namespace:DesktopApp"
+		Title="{Binding AppTitle}" 
+        Height="600" Width="900"
+        x:Name="theWindow">
+    <Window.Resources>
+        <proj:TwainVM x:Key="vm"></proj:TwainVM>
+    </Window.Resources>
+    <Window.DataContext>
+        <StaticResource ResourceKey="vm"></StaticResource>
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Label Content="Sources"></Label>
+        <ListBox x:Name="SrcList" Grid.Row="1" Width="250"
+                 ItemsSource="{Binding DataSources}"
+                 SelectedItem="{Binding SelectedSource}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap"></TextBlock>
+                        <TextBlock Text="{Binding Version, StringFormat='Version {0}'}" TextWrapping="Wrap" Margin="8 0 0 0"/>
+                        <TextBlock Text="{Binding Protocol, StringFormat='TWAIN {0}'}" Margin="8 0 0 0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="1" >
+            <Button Content="S_can" Command="{Binding CaptureCommand}" Margin="10,2" VerticalAlignment="Center" Width="70"></Button>
+            <CheckBox Content="Show _UI" IsChecked="{Binding ShowUI}" VerticalAlignment="Center"></CheckBox>
+        </StackPanel>
+
+        <ListBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding CapturedImages}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel ScrollViewer.HorizontalScrollBarVisibility="Disabled" MaxWidth="650"></WrapPanel>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="4">
+                        <Image Stretch="Uniform" 
+                               RenderOptions.BitmapScalingMode="HighQuality"
+                               Width="{Binding ElementName=theWindow, Path=DataContext.ThumbnailSize}"
+                               Height="{Binding ElementName=theWindow, Path=DataContext.ThumbnailSize}"
+                               Source="{Binding}"></Image>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>
