@@ -13,7 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace Sample.WPF
+namespace DocDigitFinal
 {
     /// <summary>
     /// Wraps the twain session as a view model for databinding.
@@ -38,21 +38,6 @@ namespace Sample.WPF
         TwainSession _session;
 
         #region properties
-
-        public string AppTitle
-        {
-            get
-            {
-                if (NTwain.PlatformInfo.Current.IsApp64Bit)
-                {
-                    return "TWAIN Data Source Tester (64bit)";
-                }
-                else
-                {
-                    return "TWAIN Data Source Tester (32bit)";
-                }
-            }
-        }
         public ObservableCollection<DataSourceVM> DataSources { get; private set; }
         private DataSourceVM _selectedSource;
 
@@ -90,10 +75,10 @@ namespace Sample.WPF
                 else
                 {
                     // use this for internal msg loop
-                    var rc = _session.Open();
+                    //var rc = _session.Open();
 
                     // use this to hook into current app loop
-                    //var rc = _session.Open(new WpfMessageLoopHook(value));
+                    var rc = _session.Open(new WpfMessageLoopHook(value));
 
                     if (rc == ReturnCode.Success)
                     {
@@ -152,7 +137,7 @@ namespace Sample.WPF
                     }
                 }, () =>
                 {
-                    return _session.State == 4;
+                    return true;//_session.State == 4;
                 }));
             }
         }
@@ -329,7 +314,7 @@ namespace Sample.WPF
                     {
                         if (stream != null)
                         {
-                            img = stream.ConvertToWpfBitmap(300, 0);
+                            img = stream.ConvertToWpfBitmap(10000, 0);
                         }
                     }
                     break;
@@ -355,6 +340,18 @@ namespace Sample.WPF
             //    img.Freeze();
             //}
             return img;
+        }
+
+        private ImageSource _selectedImage;
+
+        public ImageSource SelectedImage
+        {
+            get { return _selectedImage; }
+            set
+            {
+                _selectedImage = value;
+                RaisePropertyChanged(() => SelectedImage);
+            }
         }
 
         internal void CloseDown()
