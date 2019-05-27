@@ -4,15 +4,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DocDigitFinal"
+        xmlns:twain="clr-namespace:NTwain;assembly=NTwain"
+        xmlns:modern="http://modernwpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800" MinWidth="800" MinHeight="600">
+        Title="Doc-Digit" Height="900" Width="1200" MinWidth="800" MinHeight="600" Icon="scanner.ico"
+        x:Name="theWindow" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:TwainVM x:Key="vm"></local:TwainVM>
+    </Window.Resources>
+    <Window.DataContext>
+        <StaticResource ResourceKey="vm"></StaticResource>
+    </Window.DataContext>
     <Grid>
         <Grid.Background>
             <SolidColorBrush Color="#FFEEEEEE"/>
         </Grid.Background>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="6*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="7*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -27,19 +36,29 @@
                     <RowDefinition Height="46"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <DockPanel Background="White">
-                    <TextBox Text="Szukaj (Ctrl+F)..." VerticalAlignment="Center" BorderBrush="{x:Null}" Margin="5,0,0,0" Foreground="#FF888888"/>
-                    <Viewbox DockPanel.Dock="Right" HorizontalAlignment="Right">
-                        <Canvas Width="24" Height="24" Background="{DynamicResource grayBrush}">
-                            <Path Data="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" Fill="#FF888888" />
-                        </Canvas>
-                    </Viewbox>
-                </DockPanel>
-                <ListBox Grid.Row="1" BorderBrush="{DynamicResource grayBrush}" BorderThickness="0,1,0,0"/>
+                <TextBox modern:TextBoxUI.WatermarkText="Szukaj (Ctrl+F)..." VerticalAlignment="Stretch" Margin="0,0,46,0" FontFamily="Roboto"/>
+                <Viewbox DockPanel.Dock="Right" HorizontalAlignment="Right">
+                    <Canvas Width="24" Height="24" Background="{DynamicResource grayBrush}">
+                        <Path Data="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" Fill="#FF888888" />
+                    </Canvas>
+                </Viewbox>
+                <ListBox x:Name="SrcList" Grid.Row="1" Style="{StaticResource AppListBox}" BorderBrush="{DynamicResource grayBrush}" BorderThickness="0,1,0,0" ItemsSource="{Binding DataSources}" SelectedItem="{Binding SelectedSource}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}" TextWrapping="Wrap"></TextBlock>
+                                <TextBlock Text="{Binding Version, StringFormat='Version {0}'}" TextWrapping="Wrap" Foreground="{DynamicResource ModernForeground2}"
+                                   Margin="8 0 0 0"/>
+                                <TextBlock Text="{Binding Protocol, StringFormat='TWAIN {0}'}" Foreground="{DynamicResource ModernForeground2}"
+                                   Margin="8 0 0 0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Grid>
         </GroupBox>
         <GroupBox Header="2. Wybierz Dokument" Grid.Row="1" FontFamily="Roboto" FontSize="20" Margin="10" Foreground="{DynamicResource grayBrush}" Template="{DynamicResource GroupBoxControl}" Grid.Column="1">
-            <ComboBox Margin="5" Height="46" BorderBrush="{DynamicResource eeYellow}"/>
+            <ComboBox Margin="5" Height="46"/>
         </GroupBox>
         <GroupBox Header="3. Skanuj" Grid.Row="2" FontFamily="Roboto" FontSize="20" Margin="10,0,10,10" Foreground="{DynamicResource grayBrush}" Template="{DynamicResource GroupBoxControl}" Grid.Column="1">
             <Grid Margin="5">
@@ -51,8 +70,35 @@
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel/>
-                <Canvas Background="#FF51A616" Width="210" Grid.Column="1" Height="297"/>
+                <ListBox ItemsSource="{Binding CapturedImages}" SelectedItem="{Binding SelectedImage}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="4">
+                                <Image Stretch="Uniform" 
+                               RenderOptions.BitmapScalingMode="LowQuality"
+                               Width="{Binding ElementName=theWindow, Path=DataContext.ThumbnailSize}"
+                               Height="{Binding ElementName=theWindow, Path=DataContext.ThumbnailSize}"
+                               Source="{Binding}"></Image>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock Text="{Binding State}" Grid.Row="1"></TextBlock>
+                <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" >
+                    <Button Content="S_can" Command="{Binding CaptureCommand}" Margin="10,2" VerticalAlignment="Center"/>
+                    <CheckBox Content="Show _UI" IsChecked="{Binding ShowUI}" VerticalAlignment="Center"/>
+                    <CheckBox DataContext="{x:Static twain:PlatformInfo.Current}"
+                      IsChecked="{Binding PreferNewDSM}"
+                      IsEnabled="{Binding IsWindows, Mode=OneWay}"
+                      Content="Prefer new DSM"
+                      HorizontalAlignment="Center"></CheckBox>
+                </StackPanel>
+                <Image Source="{Binding SelectedImage}" RenderOptions.BitmapScalingMode="HighQuality" Grid.Column="1" Margin="10,10,10,10"/>
             </Grid>
         </GroupBox>
         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
