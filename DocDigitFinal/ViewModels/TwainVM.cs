@@ -1,5 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using ModernWpf.Messages;
 using NTwain;
@@ -137,7 +137,7 @@ namespace DocDigitFinal
                     }
                 }, () =>
                 {
-                    return true;//_session.State == 4;
+                    return _session.State == 4;
                 }));
             }
         }
@@ -193,9 +193,61 @@ namespace DocDigitFinal
                     {
                         DataSources.Add(s);
                     }
+                    if (DataSources.Count > 0) SelectedSource = DataSources[0];
                 }, () =>
                 {
                     return _session.State > 2;
+                }));
+            }
+        }
+
+        private ICommand _rotateLeftCommand;
+        public ICommand RotateLeftCommand
+        {
+            get
+            {
+                return _rotateLeftCommand ?? (_rotateLeftCommand = new RelayCommand(() =>
+                {
+                    TransformedBitmap img = new TransformedBitmap((BitmapSource)SelectedImage, new RotateTransform(-90));
+                    CapturedImages[CapturedImages.IndexOf(SelectedImage)] = img;
+                    SelectedImage = img;
+                }, () =>
+                {
+                    return _selectedImage != null;
+                }));
+            }
+        }
+
+        private ICommand _rotateRightCommand;
+        public ICommand RotateRightCommand
+        {
+            get
+            {
+                return _rotateRightCommand ?? (_rotateRightCommand = new RelayCommand(() =>
+                {
+                    TransformedBitmap img = new TransformedBitmap((BitmapSource)SelectedImage, new RotateTransform(90));
+                    CapturedImages[CapturedImages.IndexOf(SelectedImage)] = img;
+                    SelectedImage = img;
+                }, () =>
+                {
+                    return _selectedImage != null;
+                }));
+            }
+        }
+
+        private ICommand _removeSelectedCommand;
+        public ICommand RemoveSelectedCommand
+        {
+            get
+            {
+                return _removeSelectedCommand ?? (_removeSelectedCommand = new RelayCommand(() =>
+                {
+                    CapturedImages.RemoveAt(CapturedImages.IndexOf(SelectedImage));
+                    if (CapturedImages.Count > 0) SelectedImage = CapturedImages.Last();
+                    // else call api cancel 
+                }, () =>
+                {
+                    return _selectedImage != null;
                 }));
             }
         }
@@ -298,6 +350,7 @@ namespace DocDigitFinal
                 App.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     CapturedImages.Add(img);
+                    SelectedImage = img;
                 }));
             }
         }
@@ -314,7 +367,7 @@ namespace DocDigitFinal
                     {
                         if (stream != null)
                         {
-                            img = stream.ConvertToWpfBitmap(10000, 0);
+                            img = stream.ConvertToWpfBitmap(512,0);
                         }
                     }
                     break;
