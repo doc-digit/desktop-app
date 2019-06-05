@@ -14,7 +14,7 @@
             <Border x:Name="PinBorder" Height="50" Margin="0,0,0,10" Background="White" BorderBrush="{DynamicResource grayBrush}" BorderThickness="1" >
                 <TextBox x:Name="PinTextBox" modern:TextBoxUI.WatermarkText="PIN" FontFamily="Roboto" FontSize="20" Cursor="Hand" BorderBrush="{x:Null}" KeyDown="PinTextBox_KeyDown"/>
             </Border>
-            <Button Content="Zaloguj" Height="50" FontFamily="Roboto" FontSize="20" Padding="0" Foreground="{DynamicResource grayBrush}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" BorderBrush="{x:Null}" Background="{DynamicResource eeYellow}" Click="Button_Click">
+            <Button Content="Zaloguj" Height="50" FontFamily="Roboto" FontSize="20" Padding="0" Foreground="{DynamicResource grayBrush}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderThickness="0" BorderBrush="{x:Null}" Background="{DynamicResource eeYellow}" Click="Button_Click" Cursor="Hand">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Style.BasedOn>

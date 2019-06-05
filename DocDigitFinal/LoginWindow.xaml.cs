@@ -66,6 +66,7 @@ namespace DocDigitFinal
                         ErrorLabel.Visibility = Visibility.Visible;
                         Console.WriteLine(ex.Message);
                     }
+                    PinTextBox.Focus();
                 }
             }
         }
