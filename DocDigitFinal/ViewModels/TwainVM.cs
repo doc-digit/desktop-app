@@ -1,4 +1,5 @@
-﻿using GalaSoft.MvvmLight;
+﻿using DocDigitFinal.ViewModels;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
 using ModernWpf.Messages;
@@ -24,6 +25,10 @@ namespace DocDigitFinal
         {
             DataSources = new ObservableCollection<DataSourceVM>();
             CapturedImages = new ObservableCollection<ImageSource>();
+            Students = new ObservableCollection<Student>();
+            Students.Add(new Student { id = 1, name = "Paweł", surname = "Makowski", album_id = 284928, course_name = "Informatyka", faculty = "Elektryczny", semester = 6 });
+            Documents = new ObservableCollection<string>();
+            Documents.Add("Wniosek o przedłużenie czasu projektu");
 
             //this.SynchronizationContext = SynchronizationContext.Current;
             var appId = TWIdentity.CreateFromAssembly(DataGroups.Image | DataGroups.Audio, Assembly.GetEntryAssembly());
@@ -39,8 +44,21 @@ namespace DocDigitFinal
 
         #region properties
         public ObservableCollection<DataSourceVM> DataSources { get; private set; }
-        private DataSourceVM _selectedSource;
+        public ObservableCollection<Student> Students { get; set; }
+        public ObservableCollection<string> Documents { get; set; }
 
+        private User _currentUser;
+        public User CurrentUser
+        {
+            get { return _currentUser; }
+            set
+            {
+                _currentUser = value;
+                RaisePropertyChanged(() => CurrentUser);
+            }
+        }
+
+        private DataSourceVM _selectedSource;
         public DataSourceVM SelectedSource
         {
             get { return _selectedSource; }
@@ -92,7 +110,6 @@ namespace DocDigitFinal
         {
             get; set;
         }
-
 
 
         private ICommand _showDriverCommand;
@@ -235,6 +252,50 @@ namespace DocDigitFinal
             }
         }
 
+        private ICommand _moveUpCommand;
+        public ICommand MoveUpCommand
+        {
+            get
+            {
+                return _moveUpCommand ?? (_moveUpCommand = new RelayCommand(() =>
+                {
+                    var selectedImgIndex = CapturedImages.IndexOf(SelectedImage);
+                    if (selectedImgIndex != 0)
+                    {
+                        var tmpImg = CapturedImages[selectedImgIndex - 1];
+                        CapturedImages[selectedImgIndex - 1] = SelectedImage;
+                        CapturedImages[selectedImgIndex] = tmpImg;
+                        SelectedImage = CapturedImages[selectedImgIndex - 1];
+                    }
+                }, () =>
+                {
+                    return _selectedImage != null;
+                }));
+            }
+        }
+
+        private ICommand _moveDownCommand;
+        public ICommand MoveDownCommand
+        {
+            get
+            {
+                return _moveDownCommand ?? (_moveDownCommand = new RelayCommand(() =>
+                {
+                    var selectedImgIndex = CapturedImages.IndexOf(SelectedImage);
+                    if (selectedImgIndex != CapturedImages.Count - 1)
+                    {
+                        var tmpImg = CapturedImages[selectedImgIndex + 1];
+                        CapturedImages[selectedImgIndex + 1] = SelectedImage;
+                        CapturedImages[selectedImgIndex] = tmpImg;
+                        SelectedImage = CapturedImages[selectedImgIndex + 1];
+                    }
+                }, () =>
+                {
+                    return _selectedImage != null;
+                }));
+            }
+        }
+
         private ICommand _removeSelectedCommand;
         public ICommand RemoveSelectedCommand
         {
@@ -248,6 +309,23 @@ namespace DocDigitFinal
                 }, () =>
                 {
                     return _selectedImage != null;
+                }));
+            }
+        }
+
+        private ICommand _sendCommand;
+        public bool IsSendVisible;
+        public ICommand SendCommand
+        {
+            get
+            {
+                return _sendCommand ?? (_sendCommand = new RelayCommand(() =>
+                {
+                    // 
+                }, () =>
+                {
+                    IsSendVisible = CapturedImages != null && SelectedStudent != null && SelectedDocument != null;
+                    return IsSendVisible;
                 }));
             }
         }
@@ -350,6 +428,7 @@ namespace DocDigitFinal
                 App.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     CapturedImages.Add(img);
+                    //upload
                     SelectedImage = img;
                 }));
             }
@@ -367,7 +446,7 @@ namespace DocDigitFinal
                     {
                         if (stream != null)
                         {
-                            img = stream.ConvertToWpfBitmap(512,0);
+                            img = stream.ConvertToWpfBitmap(512, 0);
                         }
                     }
                     break;
@@ -396,7 +475,6 @@ namespace DocDigitFinal
         }
 
         private ImageSource _selectedImage;
-
         public ImageSource SelectedImage
         {
             get { return _selectedImage; }
@@ -404,6 +482,28 @@ namespace DocDigitFinal
             {
                 _selectedImage = value;
                 RaisePropertyChanged(() => SelectedImage);
+            }
+        }
+
+        private Student _selectedStudent;
+        public Student SelectedStudent
+        {
+            get { return _selectedStudent; }
+            set
+            {
+                _selectedStudent = value;
+                RaisePropertyChanged(() => SelectedStudent);
+            }
+        }
+
+        private string _selectedDocument;
+        public string SelectedDocument
+        {
+            get { return _selectedDocument; }
+            set
+            {
+                _selectedDocument = value;
+                RaisePropertyChanged(() => SelectedDocument);
             }
         }
 
