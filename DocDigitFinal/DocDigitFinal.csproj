@@ -114,13 +114,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\WebRequestHelper.cs" />
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\DataSourceVM.cs" />
-    <Compile Include="ViewModels\Student.cs" />
+    <Compile Include="DataModels\DocType.cs" />
+    <Compile Include="DataModels\Student.cs" />
     <Compile Include="ViewModels\TwainVM.cs" />
-    <Compile Include="ViewModels\User.cs" />
+    <Compile Include="DataModels\User.cs" />
     <Page Include="LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

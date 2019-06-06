@@ -1,4 +1,5 @@
-﻿using DocDigitFinal.ViewModels;
+﻿using DocDigitFinal.Helpers;
+using DocDigitFinal.ViewModels;
 using GalaSoft.MvvmLight.Messaging;
 using ModernWpf;
 using ModernWpf.Controls;
@@ -32,9 +33,8 @@ namespace DocDigitFinal
     public partial class MainWindow : Window
     {
         TwainVM _twainVM;
-        String apiUrl;
 
-        public MainWindow(User user)
+        public MainWindow(User user, ObservableCollection<DocType> docTypes)
         {
             InitializeComponent();
 
@@ -43,7 +43,7 @@ namespace DocDigitFinal
                 _twainVM = this.DataContext as TwainVM;
                 _twainVM.PropertyChanged += _twainVM_PropertyChanged;
                 _twainVM.CurrentUser = user;
-                apiUrl = ConfigurationManager.AppSettings["api_uri"];
+                _twainVM.DocTypes = docTypes;
                 Messenger.Default.Register<RefreshCommandsMessage>(this, m => m.HandleIt());
                 Messenger.Default.Register<ChooseFileMessage>(this, m =>
                 {
@@ -119,23 +119,11 @@ namespace DocDigitFinal
             var student = (sender as TextBox).Text;
             if (student.Length > 2)
             {
-                await GetStudentAsync(student);
-            }
-        }
-
-        public async Task GetStudentAsync(string student)
-        {
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"{apiUrl}/student/find?q={HttpUtility.UrlEncodeUnicode(student)}");
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-
-            using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                Console.WriteLine(request.RequestUri);
-                Console.WriteLine(reader.ReadToEnd());
-                _twainVM.Students = JsonConvert.DeserializeObject<ObservableCollection<Student>>(await reader.ReadToEndAsync());
+                try
+                {
+                    _twainVM.Students = JsonConvert.DeserializeObject<ObservableCollection<Student>>(await WebRequestHelper.GetAsync($"/student/find?q={HttpUtility.UrlEncodeUnicode(student)}"));
+                }
+                catch { }
             }
         }
 
@@ -152,22 +140,6 @@ namespace DocDigitFinal
             LogoutButton.Visibility = Visibility.Visible;
         }
 
-        bool isOverLogout = false;
-        private void LogoutButton_MouseEnter(object sender, MouseEventArgs e)
-        {
-            isOverLogout = true;
-        }
-
-        private void LogoutButton_MouseLeave(object sender, MouseEventArgs e)
-        {
-            isOverLogout = false;
-        }
-
-        private void UserNameButton_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (!isOverLogout) LogoutButton.Visibility = Visibility.Hidden;
-        }
-
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
             _twainVM.CloseDown();
@@ -175,5 +147,14 @@ namespace DocDigitFinal
             Close();
         }
 
+        private void UserNameButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!LogoutButton.IsMouseOver) LogoutButton.Visibility = Visibility.Hidden;
+        }
+
+        private void LogoutButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!UserNameButton.IsMouseOver) LogoutButton.Visibility = Visibility.Hidden;
+        }
     }
 }

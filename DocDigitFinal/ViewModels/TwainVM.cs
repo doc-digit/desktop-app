@@ -25,10 +25,6 @@ namespace DocDigitFinal
         {
             DataSources = new ObservableCollection<DataSourceVM>();
             CapturedImages = new ObservableCollection<ImageSource>();
-            Students = new ObservableCollection<Student>();
-            Students.Add(new Student { id = 1, name = "Paweł", surname = "Makowski", album_id = 284928, course_name = "Informatyka", faculty = "Elektryczny", semester = 6 });
-            Documents = new ObservableCollection<string>();
-            Documents.Add("Wniosek o przedłużenie czasu projektu");
 
             //this.SynchronizationContext = SynchronizationContext.Current;
             var appId = TWIdentity.CreateFromAssembly(DataGroups.Image | DataGroups.Audio, Assembly.GetEntryAssembly());
@@ -44,8 +40,39 @@ namespace DocDigitFinal
 
         #region properties
         public ObservableCollection<DataSourceVM> DataSources { get; private set; }
-        public ObservableCollection<Student> Students { get; set; }
-        public ObservableCollection<string> Documents { get; set; }
+
+        private ImageSource _selectedImage;
+        public ImageSource SelectedImage
+        {
+            get { return _selectedImage; }
+            set
+            {
+                _selectedImage = value;
+                RaisePropertyChanged(() => SelectedImage);
+            }
+        }
+
+        private Student _selectedStudent;
+        public Student SelectedStudent
+        {
+            get { return _selectedStudent; }
+            set
+            {
+                _selectedStudent = value;
+                RaisePropertyChanged(() => SelectedStudent);
+            }
+        }
+
+        private string _selectedDocument;
+        public string SelectedDocument
+        {
+            get { return _selectedDocument; }
+            set
+            {
+                _selectedDocument = value;
+                RaisePropertyChanged(() => SelectedDocument);
+            }
+        }
 
         private User _currentUser;
         public User CurrentUser
@@ -55,6 +82,26 @@ namespace DocDigitFinal
             {
                 _currentUser = value;
                 RaisePropertyChanged(() => CurrentUser);
+            }
+        }
+
+         public ObservableCollection<DocType> _docTypes;
+        public ObservableCollection<DocType> DocTypes {
+            get { return _docTypes; }
+            set
+            {
+                _docTypes = value;
+                RaisePropertyChanged(() => DocTypes);
+            }
+        }
+
+        public ObservableCollection<Student> _students;
+        public ObservableCollection<Student> Students {
+            get { return _students; }
+            set
+            {
+                _students = value;
+                RaisePropertyChanged(() => Students);
             }
         }
 
@@ -139,18 +186,7 @@ namespace DocDigitFinal
                 {
                     if (_session.State == 4)
                     {
-                        //if (this.CurrentSource.ICapPixelType.Get().Contains(PixelType.BlackWhite))
-                        //{
-                        //    this.CurrentSource.ICapPixelType.Set(PixelType.BlackWhite);
-                        //}
-
-                        //if (this.CurrentSource.ICapXferMech.Get().Contains(XferMech.File))
-                        //{
-                        //    this.CurrentSource.ICapXferMech.Set(XferMech.File);
-                        //}
-
-                        var rc = _session.CurrentSource.Enable(
-                            ShowUI ? SourceEnableMode.ShowUI : SourceEnableMode.NoUI, false, WindowHandle);
+                        var rc = _session.CurrentSource.Enable(ShowUI ? SourceEnableMode.ShowUI : SourceEnableMode.NoUI, false, WindowHandle);
                     }
                 }, () =>
                 {
@@ -158,31 +194,6 @@ namespace DocDigitFinal
                 }));
             }
         }
-
-
-        //private ICommand _saveCommand;
-        //public ICommand SaveCommand
-        //{
-        //    get
-        //    {
-        //        return _saveCommand ?? (_saveCommand = new RelayCommand(() =>
-        //        {
-        //            Messenger.Default.Send(new ChooseFileMessage(this, files =>
-        //            {
-        //                var tiffPath = files.FirstOrDefault();
-
-        //                var srcFiles = CapturedImages.Select(ci=>ci.)
-        //            })
-        //            {
-        //                Caption = "Save to File",
-        //                Filters = "Tiff files|*.tif,*.tiff"
-        //            });
-        //        }, () =>
-        //        {
-        //            return CapturedImages.Count > 0;
-        //        }));
-        //    }
-        //}
 
         private ICommand _clearCommand;
         public ICommand ClearCommand
@@ -198,6 +209,7 @@ namespace DocDigitFinal
                 }));
             }
         }
+
         private ICommand _reloadSrc;
         public ICommand ReloadSourcesCommand
         {
@@ -321,7 +333,7 @@ namespace DocDigitFinal
             {
                 return _sendCommand ?? (_sendCommand = new RelayCommand(() =>
                 {
-                    // 
+                    // finish, confirm pdf
                 }, () =>
                 {
                     IsSendVisible = CapturedImages != null && SelectedStudent != null && SelectedDocument != null;
@@ -472,39 +484,6 @@ namespace DocDigitFinal
             //    img.Freeze();
             //}
             return img;
-        }
-
-        private ImageSource _selectedImage;
-        public ImageSource SelectedImage
-        {
-            get { return _selectedImage; }
-            set
-            {
-                _selectedImage = value;
-                RaisePropertyChanged(() => SelectedImage);
-            }
-        }
-
-        private Student _selectedStudent;
-        public Student SelectedStudent
-        {
-            get { return _selectedStudent; }
-            set
-            {
-                _selectedStudent = value;
-                RaisePropertyChanged(() => SelectedStudent);
-            }
-        }
-
-        private string _selectedDocument;
-        public string SelectedDocument
-        {
-            get { return _selectedDocument; }
-            set
-            {
-                _selectedDocument = value;
-                RaisePropertyChanged(() => SelectedDocument);
-            }
         }
 
         internal void CloseDown()

@@ -1,7 +1,9 @@
-﻿using DocDigitFinal.ViewModels;
+﻿using DocDigitFinal.Helpers;
+using DocDigitFinal.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -44,8 +46,9 @@ namespace DocDigitFinal
                 PinBorder.BorderThickness = new Thickness(1);
                 try
                 {
-                    var result = await PostLogin();
-                    new MainWindow(JsonConvert.DeserializeObject<User>(result)).Show();
+                    var userName = JsonConvert.DeserializeObject<User>(await WebRequestHelper.PostAsync("/user/login", $"{{ \"pin\": {PinTextBox.Text}}}", "application/json"));
+                    var docTypes = JsonConvert.DeserializeObject<ObservableCollection<DocType>>(await WebRequestHelper.GetAsync("/document/types"));
+                    new MainWindow(userName, docTypes).Show();
                     Close();
                 }
                 catch (Exception ex)
@@ -60,7 +63,7 @@ namespace DocDigitFinal
                     }
                     else
                     {
-                        ErrorLabel.Content = "Błąd serwera. Spróbuj ponownie później.";
+                        ErrorLabel.Content = "Błąd połączenia. Spróbuj ponownie później.";
                         PinBorder.BorderBrush = Brushes.Red;
                         PinBorder.BorderThickness = new Thickness(2);
                         ErrorLabel.Visibility = Visibility.Visible;
@@ -70,33 +73,21 @@ namespace DocDigitFinal
             }
         }
 
-        public async Task<string> PostLogin()
-        {
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-            byte[] dataBytes = Encoding.UTF8.GetBytes($"{{ \"pin\": {PinTextBox.Text}}}");
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create($"{ConfigurationManager.AppSettings["api_uri"]}/user/login");
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            request.ContentLength = dataBytes.Length;
-            request.ContentType = "application/json";
-            request.Method = "POST";
-
-            using (Stream requestBody = request.GetRequestStream())
-            {
-                await requestBody.WriteAsync(dataBytes, 0, dataBytes.Length);
-            }
-
-            using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return await reader.ReadToEndAsync();
-            }
-        }
-
         private void PinTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            e.Handled = !(e.Key >= Key.D0 && e.Key <= Key.D9) && !(e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9);
+            e.Handled = !(e.Key >= Key.D0 && e.Key <= Key.D9) && !(e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) && !(e.Key == Key.Enter);
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Button_Click(sender, e);
+            }
+            else if (!PinTextBox.IsFocused)
+            {
+                PinTextBox.Focus();
+            }
         }
     }
 }
