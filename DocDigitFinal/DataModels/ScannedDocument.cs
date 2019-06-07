@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -55,8 +56,9 @@ namespace DocDigitFinal.DataModels
                     encoder.Save(fileStream);
                 }
 
-                var png = File.ReadAllBytes("tmp.png").ToString();
-                var resp = await WebRequestHelper.PostAsync(respObj.url, png, "image/png", "PUT");
+                var wc = new WebClient();
+                var png = File.ReadAllBytes("tmp.png");
+                wc.UploadData(respObj.url, "PUT", png);
             }
             catch (Exception e)
             {
@@ -68,16 +70,19 @@ namespace DocDigitFinal.DataModels
         {
             try
             {
-                var data = $"{{ \"document\": \"{ScanId}\", \"page_order\": [";
+                var data = $"{{ \"document\": \"{ScanId}\", \"page_order\": [ ";
                 foreach (var page in ScannedPages)
                 {
                     data += $"\"{page.Key}\", ";
                 }
                 data = data.Substring(0, data.Length - 2);
-                data += "]}}";
-                await WebRequestHelper.PostAsync(ConfigurationManager.AppSettings["ApiUri"] + "//document/create_pdf", data, "application/json");
+                data += " ]}";
+                await WebRequestHelper.PostAsync(ConfigurationManager.AppSettings["ApiUri"] + "/document/create_pdf", data, "application/json");
             }
-            catch { }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }

@@ -333,7 +333,7 @@ namespace DocDigitFinal
                 {
                     // Confirming upload
                     await scannedDocument.Upload();
-                    CapturedImages = new ObservableCollection<ImageSource>();
+                    CapturedImages.Clear();
                     scannedDocument = null;
                 }, () =>
                 {
