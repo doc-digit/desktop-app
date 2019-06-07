@@ -30,7 +30,7 @@
             <Rectangle Fill="{DynamicResource eeYellow}"/>
         </Border>
         <TextBlock Text="Doc-Digit" FontFamily="Roboto Black" FontWeight="Bold" FontSize="36" VerticalAlignment="Center" Margin="10,3.397,0,3.397" Foreground="{DynamicResource grayBrush}"/>
-        <GroupBox Header="1. Wybierz Studenta" Grid.Row="1" FontFamily="Roboto" FontSize="20" Margin="10,10,10,10" Foreground="{DynamicResource grayBrush}" Template="{DynamicResource GroupBoxControl}" Grid.RowSpan="2">
+        <GroupBox Header="1. Wybierz studenta" Grid.Row="1" FontFamily="Roboto" FontSize="20" Margin="10,10,10,10" Foreground="{DynamicResource grayBrush}" Template="{DynamicResource GroupBoxControl}" Grid.RowSpan="2">
             <Grid Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="46"/>
@@ -68,7 +68,7 @@
                 </ListBox>-->
             </Grid>
         </GroupBox>
-        <GroupBox Header="2. Wybierz Rodzaj Dokumentu" Grid.Row="1" FontFamily="Roboto" FontSize="20" Margin="10" Foreground="{DynamicResource grayBrush}" Template="{DynamicResource GroupBoxControl}" Grid.Column="1">
+        <GroupBox Header="2. Wybierz rodzaj dokumentu" Grid.Row="1" FontFamily="Roboto" FontSize="20" Margin="10" Foreground="{DynamicResource grayBrush}" Template="{DynamicResource GroupBoxControl}" Grid.Column="1">
             <ComboBox Margin="5" Height="46" FontFamily="Roboto" ItemsSource="{Binding DocTypes}" SelectedItem="{Binding SelectedDocument}" ToolTip="Wybierz rodzaj dokumentu"/>
         </GroupBox>
         <GroupBox Header="3. Skanuj" Grid.Row="2" FontFamily="Roboto" FontSize="20" Margin="10,0,10,10" Foreground="{DynamicResource grayBrush}" Template="{DynamicResource GroupBoxControl}" Grid.Column="1">
@@ -81,7 +81,7 @@
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-                <ListBox x:Name="ScansListBox" ItemsSource="{Binding CapturedImages}" SelectedItem="{Binding SelectedImage}" Margin="0,10,10,10">
+                <ListBox x:Name="ScansListBox" ItemsSource="{Binding CapturedImages}" SelectedItem="{Binding SelectedImage}" Margin="0,10">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <StackPanel/>
