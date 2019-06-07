@@ -121,7 +121,7 @@ namespace DocDigitFinal
             {
                 try
                 {
-                    _twainVM.Students = JsonConvert.DeserializeObject<ObservableCollection<Student>>(await WebRequestHelper.GetAsync($"/student/find?q={HttpUtility.UrlEncodeUnicode(student)}"));
+                    _twainVM.Students = JsonConvert.DeserializeObject<ObservableCollection<Student>>(await WebRequestHelper.GetAsync(ConfigurationManager.AppSettings["ApiUri"] + $"/student/find?q={HttpUtility.UrlEncodeUnicode(student)}"));
                 }
                 catch { }
             }

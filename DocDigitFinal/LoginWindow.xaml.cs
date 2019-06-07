@@ -46,8 +46,8 @@ namespace DocDigitFinal
                 PinBorder.BorderThickness = new Thickness(1);
                 try
                 {
-                    var userName = JsonConvert.DeserializeObject<User>(await WebRequestHelper.PostAsync("/user/login", $"{{ \"pin\": {PinTextBox.Text}}}", "application/json"));
-                    var docTypes = JsonConvert.DeserializeObject<ObservableCollection<DocType>>(await WebRequestHelper.GetAsync("/document/types"));
+                    var userName = JsonConvert.DeserializeObject<User>(await WebRequestHelper.PostAsync(ConfigurationManager.AppSettings["ApiUri"] + "/user/login", $"{{ \"pin\": {PinTextBox.Text}}}", "application/json"));
+                    var docTypes = JsonConvert.DeserializeObject<ObservableCollection<DocType>>(await WebRequestHelper.GetAsync(ConfigurationManager.AppSettings["ApiUri"] + "/document/types"));
                     new MainWindow(userName, docTypes).Show();
                     Close();
                 }
@@ -81,7 +81,7 @@ namespace DocDigitFinal
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (e.Key == Key.Enter && !LoadingPanel.IsVisible)
             {
                 Button_Click(sender, e);
             }

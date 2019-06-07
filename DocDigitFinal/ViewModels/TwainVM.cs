@@ -1,4 +1,5 @@
-﻿using DocDigitFinal.ViewModels;
+﻿using DocDigitFinal.DataModels;
+using DocDigitFinal.ViewModels;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
@@ -39,6 +40,7 @@ namespace DocDigitFinal
         TwainSession _session;
 
         #region properties
+        private ScannedDocument scannedDocument;
         public ObservableCollection<DataSourceVM> DataSources { get; private set; }
 
         private ImageSource _selectedImage;
@@ -63,8 +65,8 @@ namespace DocDigitFinal
             }
         }
 
-        private string _selectedDocument;
-        public string SelectedDocument
+        private DocType _selectedDocument;
+        public DocType SelectedDocument
         {
             get { return _selectedDocument; }
             set
@@ -139,10 +141,6 @@ namespace DocDigitFinal
                 }
                 else
                 {
-                    // use this for internal msg loop
-                    //var rc = _session.Open();
-
-                    // use this to hook into current app loop
                     var rc = _session.Open(new WpfMessageLoopHook(value));
 
                     if (rc == ReturnCode.Success)
@@ -331,9 +329,12 @@ namespace DocDigitFinal
         {
             get
             {
-                return _sendCommand ?? (_sendCommand = new RelayCommand(() =>
+                return _sendCommand ?? (_sendCommand = new RelayCommand(async () =>
                 {
-                    // finish, confirm pdf
+                    // Confirming upload
+                    await scannedDocument.Upload();
+                    CapturedImages = new ObservableCollection<ImageSource>();
+                    scannedDocument = null;
                 }, () =>
                 {
                     IsSendVisible = CapturedImages != null && SelectedStudent != null && SelectedDocument != null;
@@ -345,8 +346,8 @@ namespace DocDigitFinal
         /// <summary>
         /// Gets the captured images.
         /// </summary>
-        /// <value>
         /// The captured images.
+        /// <value>
         /// </value>
         public ObservableCollection<ImageSource> CapturedImages { get; private set; }
 
@@ -414,11 +415,6 @@ namespace DocDigitFinal
                 };
                 var rc = _session.CurrentSource.DGControl.SetupFileXfer.Set(fileSetup);
             }
-            else if (mech == XferMech.Memory)
-            {
-                // ?
-
-            }
         }
 
         string GetUniqueName(string dir, string name, string ext)
@@ -437,11 +433,19 @@ namespace DocDigitFinal
             ImageSource img = GenerateThumbnail(e);
             if (img != null)
             {
-                App.Current.Dispatcher.BeginInvoke(new Action(() =>
+                App.Current.Dispatcher.BeginInvoke(new Action(async () =>
                 {
                     CapturedImages.Add(img);
-                    //upload
                     SelectedImage = img;
+                    if (IsSendVisible && scannedDocument == null)
+                    {
+                        scannedDocument = new ScannedDocument(CurrentUser.id, SelectedStudent.id, SelectedDocument.id);
+                        await scannedDocument.InitScan();
+                    }
+                    if (scannedDocument != null)
+                    {
+                        await scannedDocument.AddPage(img);
+                    }
                 }));
             }
         }
@@ -458,7 +462,8 @@ namespace DocDigitFinal
                     {
                         if (stream != null)
                         {
-                            img = stream.ConvertToWpfBitmap(512, 0);
+                            // file size
+                            img = stream.ConvertToWpfBitmap(1536, 0);
                         }
                     }
                     break;
@@ -473,16 +478,6 @@ namespace DocDigitFinal
                     // TODO: build current image from multiple data-xferred event
                     break;
             }
-
-            //if (img != null)
-            //{
-            //    // from http://stackoverflow.com/questions/18189501/create-thumbnail-image-directly-from-header-less-image-byte-array
-            //    var scale = MaxThumbnailSize / img.PixelWidth;
-            //    var transform = new ScaleTransform(scale, scale);
-            //    var thumbnail = new TransformedBitmap(img, transform);
-            //    img = new WriteableBitmap(new TransformedBitmap(img, transform));
-            //    img.Freeze();
-            //}
             return img;
         }
 
