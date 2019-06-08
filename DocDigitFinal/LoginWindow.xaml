@@ -68,12 +68,12 @@
                     </Button.Style>
                 </Button>
             </StackPanel>
-            <Border x:Name="LoadingPanel" Background="#CCD1D1D1" Visibility="Hidden" >
+            <Border x:Name="LoadingPanel" Background="#CCD1D1D1" Visibility="Hidden">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                     <!--<Image Source="loading.apng" SnapsToDevicePixels="True" Margin="20" />-->
                 </StackPanel>
             </Border>
-            <Button Name="CloseButton" Click="CloseButton_Click" Height="32" Width="32" HorizontalAlignment="Right" VerticalAlignment="Top" FontFamily="Roboto" Padding="0" FontWeight="Normal" Background="White" Cursor="Hand" Foreground="{DynamicResource grayBrush}" BorderBrush="White" >
+            <Button Name="CloseButton" Click="CloseButton_Click" Height="32" Width="32" HorizontalAlignment="Right" VerticalAlignment="Top" FontFamily="Roboto" Padding="0" FontWeight="Normal" Background="White" Foreground="{DynamicResource grayBrush}" BorderBrush="White" >
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Style.BasedOn>

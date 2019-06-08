@@ -142,19 +142,19 @@ namespace DocDigitFinal
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            _twainVM.CloseDown();
             new LoginWindow().Show();
             Close();
         }
 
-        private void UserNameButton_MouseLeave(object sender, MouseEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (!LogoutButton.IsMouseOver) LogoutButton.Visibility = Visibility.Hidden;
+            SettingsPanel.Visibility = Visibility.Visible;
         }
 
-        private void LogoutButton_MouseLeave(object sender, MouseEventArgs e)
+        private void TheWindow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (!UserNameButton.IsMouseOver) LogoutButton.Visibility = Visibility.Hidden;
+            if (!LogoutButton.IsMouseOver && !UserNameButton.IsMouseOver) LogoutButton.Visibility = Visibility.Hidden;
+            if (!SettingsButton.IsMouseOver && !SettingsPanel.IsMouseOver) SettingsPanel.Visibility = Visibility.Hidden;
         }
     }
 }

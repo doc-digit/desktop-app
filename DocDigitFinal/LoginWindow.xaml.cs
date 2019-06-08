@@ -40,6 +40,9 @@ namespace DocDigitFinal
         {
             if (PinTextBox.Text.Length > 2)
             {
+                new MainWindow(new User() { id = 0, name = "pawel" }, null).Show();
+                Close();
+                return;
                 LoadingPanel.Visibility = Visibility.Visible;
                 ErrorLabel.Visibility = Visibility.Hidden;
                 PinBorder.BorderBrush = (Brush)FindResource("grayBrush");

@@ -9,14 +9,14 @@
         xmlns:ViewModels="clr-namespace:DocDigitFinal.ViewModels" x:Class="DocDigitFinal.MainWindow"
         mc:Ignorable="d"
         Title="Doc-Digit" Height="900" Width="1200" MinWidth="800" MinHeight="600" Icon="scanner.ico"
-        x:Name="theWindow" WindowStartupLocation="CenterScreen" KeyDown="TheWindow_KeyDown" FontFamily="Roboto">
+        x:Name="theWindow" WindowStartupLocation="CenterScreen" KeyDown="TheWindow_KeyDown" FontFamily="Roboto" MouseLeftButtonDown="TheWindow_MouseLeftButtonDown">
     <Window.Resources>
         <local:TwainVM x:Key="vm"/>
     </Window.Resources>
     <Window.DataContext>
         <StaticResource ResourceKey="vm"/>
     </Window.DataContext>
-    <Grid Background="#FFFEFEFE">
+    <Grid Background="{DynamicResource NotSoWhite}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="7*"/>
@@ -54,19 +54,6 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <!--<ListBox x:Name="SrcList" Grid.Row="1" Style="{StaticResource AppListBox}" BorderBrush="{DynamicResource grayBrush}" BorderThickness="0,1,0,0" ItemsSource="{Binding DataSources}" SelectedItem="{Binding SelectedSource}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Text="{Binding Name}" TextWrapping="Wrap"></TextBlock>
-                                <TextBlock Text="{Binding Version, StringFormat='Version {0}'}" TextWrapping="Wrap" Foreground="{DynamicResource ModernForeground2}"
-                                   Margin="8 0 0 0"/>
-                                <TextBlock Text="{Binding Protocol, StringFormat='TWAIN {0}'}" Foreground="{DynamicResource ModernForeground2}"
-                                   Margin="8 0 0 0"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>-->
             </Grid>
         </GroupBox>
         <GroupBox Header="2. Wybierz rodzaj dokumentu" Grid.Row="1" FontFamily="Roboto" FontSize="20" Margin="10" Foreground="{DynamicResource grayBrush}" Template="{DynamicResource GroupBoxControl}" Grid.Column="1">
@@ -286,7 +273,7 @@
             </Grid>
         </GroupBox>
         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="UserNameButton" Template="{DynamicResource TopBarButtonControlTemplate}" VerticalAlignment="Top" Cursor="Hand" Click="UserNameButton_Click" Height="49" MouseLeave="UserNameButton_MouseLeave">
+            <Button x:Name="UserNameButton" Template="{DynamicResource TopBarButtonControlTemplate}" VerticalAlignment="Top" Cursor="Hand" Click="UserNameButton_Click" Height="49">
                 <StackPanel Orientation="Horizontal" Margin="5,0">
                     <TextBlock FontSize="20" Text="{Binding CurrentUser.name}" FontFamily="Roboto" Foreground="{DynamicResource grayBrush}"/>
                     <Viewbox Width="20">
@@ -296,13 +283,37 @@
                     </Viewbox>
                 </StackPanel>
             </Button>
-            <Button Width="50" Template="{DynamicResource TopBarButtonControlTemplate}" VerticalAlignment="Top" Cursor="Hand" ToolTip="Ustawienia" Height="49">
+            <Button x:Name="SettingsButton" Width="50" Template="{DynamicResource TopBarButtonControlTemplate}" VerticalAlignment="Top" Cursor="Hand" ToolTip="Ustawienia" Height="49" Click="Button_Click">
                 <Canvas Width="24" Height="24" Margin="10">
                     <Path Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" Fill="{DynamicResource grayBrush}" />
                 </Canvas>
             </Button>
         </StackPanel>
-        <Border x:Name="LogoutButton" Grid.Column="1" Height="35" Margin="0,0,50,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100" CornerRadius="6" Background="{DynamicResource grayBrush}" Grid.Row="1" Visibility="Hidden" MouseLeave="LogoutButton_MouseLeave" >
+        <Border x:Name="SettingsPanel" Grid.Column="1" Grid.RowSpan="2" Background="{DynamicResource NotSoWhite}" Width="300" HorizontalAlignment="Right" Grid.Row="1" BorderBrush="{DynamicResource grayBrush}" BorderThickness="2,0,0,0" Visibility="Hidden">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Foreground="{DynamicResource grayBrush}" Background="{x:Null}" Content="Ustawienia" FontSize="24" Margin="10,10,0,10" />
+                <StackPanel Grid.Row="1">
+                    <StackPanel VerticalAlignment="Top" Margin="10">
+                        <Label Foreground="{DynamicResource grayBrush}" Background="{x:Null}" Content="Wybór skanera" FontSize="20" Margin="0"/>
+                        <ComboBox x:Name="SrcList" ItemsSource="{Binding DataSources}" SelectedItem="{Binding SelectedSource}" Height="46" BorderBrush="{DynamicResource grayBrush}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap"></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Content="Ustawienia skanera" Command="{Binding ShowDriverCommand}" Background="{DynamicResource NotSoWhite}" Template="{DynamicResource PlainButtonTemplate}" Height="46" Margin="0,10,0,0" FontFamily="Roboto" FontSize="14" BorderBrush="{DynamicResource grayBrush}"></Button>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Border x:Name="LogoutButton" Grid.Column="1" Height="35" Margin="0,0,50,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="100" CornerRadius="6" Background="{DynamicResource grayBrush}" Grid.Row="1" Visibility="Hidden">
             <Button Content="Wyloguj" FontFamily="Roboto" ToolTip="Wyloguj" BorderBrush="{x:Null}" Background="{DynamicResource grayBrush}" Foreground="#FFEEEEEE" Padding="0" Click="LogoutButton_Click" Cursor="Hand"/>
         </Border>
     </Grid>
