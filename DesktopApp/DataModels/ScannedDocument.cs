@@ -71,6 +71,7 @@ namespace DesktopApp.DataModels
         {
             try
             {
+                while (UploadQueue.Count > 0) Thread.Sleep(100);
                 var data = $"{{ \"document\": \"{ScanId}\", \"page_order\": [ ";
                 foreach (var page in scans)
                 {
