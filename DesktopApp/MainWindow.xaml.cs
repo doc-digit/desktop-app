@@ -82,17 +82,8 @@ namespace DesktopApp
                     SendButton.Visibility = Visibility.Hidden;
                 }
             }
-            if (e.PropertyName == "Upload")
-            {
-                if (UploadingPDF.IsVisible)
-                {
-                    UploadingPDF.Visibility = Visibility.Hidden;
-                }
-                else
-                {
-                    UploadingPDF.Visibility = Visibility.Visible;
-                }
-            }
+            if (e.PropertyName == "StartUpload") UploadingPDF.Visibility = Visibility.Visible;
+            if (e.PropertyName == "Uploaded") UploadingPDF.Visibility = Visibility.Hidden;
         }
 
         protected override void OnClosing(CancelEventArgs e)
