@@ -69,22 +69,15 @@ namespace DesktopApp.DataModels
 
         public async Task CreatePDF(ObservableCollection<ImageSource> scans)
         {
-            try
+            while (UploadQueue.Count > 0) Thread.Sleep(100);
+            var data = $"{{ \"document\": \"{ScanId}\", \"page_order\": [ ";
+            foreach (var page in scans)
             {
-                while (UploadQueue.Count > 0) Thread.Sleep(100);
-                var data = $"{{ \"document\": \"{ScanId}\", \"page_order\": [ ";
-                foreach (var page in scans)
-                {
-                    data += $"\"{ScannedPages.Find((k) => k.Scan == page).Id}\", ";
-                }
-                data = data.Substring(0, data.Length - 2);
-                data += " ]}";
-                await WebRequestHelper.PostAsync(ConfigurationManager.AppSettings["ApiUri"] + "/document/create_pdf", data, "application/json");
+                data += $"\"{ScannedPages.Find((k) => k.Scan == page).Id}\", ";
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            data = data.Substring(0, data.Length - 2);
+            data += " ]}";
+            await WebRequestHelper.PostAsync(ConfigurationManager.AppSettings["ApiUri"] + "/document/create_pdf", data, "application/json");
         }
 
         private async void Uploader()

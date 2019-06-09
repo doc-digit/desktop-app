@@ -402,11 +402,30 @@ namespace DesktopApp
                     var result = MessageBox.Show(messageBoxText, caption, button, icon);
                     if (result == MessageBoxResult.Yes)
                     {
-                        RaisePropertyChanged("Upload");
-                        await scannedDocument.CreatePDF(CapturedImages);
-                        CapturedImages.Clear();
-                        scannedDocument = null;
-                        RaisePropertyChanged("Upload");
+                        RaisePropertyChanged("StartUpload");
+                        while (true)
+                        {
+                            try
+                            {
+                                await scannedDocument.CreatePDF(CapturedImages);
+                                CapturedImages.Clear();
+                                scannedDocument = null;
+                                RaisePropertyChanged("Uploaded");
+                                break;
+                            }
+                            catch
+                            {
+                                messageBoxText = "Wystąpił błąd podczas przesyłania. Czy chcesz spróbować ponownie?";
+                                caption = "Zakończ skanowanie";
+                                button = MessageBoxButton.YesNo;
+                                icon = MessageBoxImage.Warning;
+                                result = MessageBox.Show(messageBoxText, caption, button, icon);
+                                if (result == MessageBoxResult.No)
+                                {
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }, () =>
                 {
