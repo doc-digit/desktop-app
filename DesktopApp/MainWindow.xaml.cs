@@ -2,28 +2,17 @@
 using DesktopApp.ViewModels;
 using GalaSoft.MvvmLight.Messaging;
 using ModernWpf;
-using ModernWpf.Controls;
 using ModernWpf.Messages;
 using Newtonsoft.Json;
-using NTwain;
-using NTwain.Data;
 using System;
-using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 
 namespace DesktopApp
 {
