@@ -63,7 +63,11 @@ namespace DesktopApp
             set
             {
                 _selectedStudent = value;
-                if (scannedDocument != null) scannedDocument.StudentId = _selectedStudent.id;
+                if (scannedDocument != null)
+                {
+                    scannedDocument.StudentId = _selectedStudent.id;
+                    App.Current.Dispatcher.InvokeAsync(async () => await scannedDocument.UpdateScan());
+                }
                 RaisePropertyChanged(() => SelectedStudent);
             }
         }
@@ -75,7 +79,11 @@ namespace DesktopApp
             set
             {
                 _selectedDocument = value;
-                if (scannedDocument != null) scannedDocument.DocumentId = _selectedDocument.id;
+                if (scannedDocument != null)
+                {
+                    scannedDocument.DocumentId = _selectedDocument.id;
+                    App.Current.Dispatcher.InvokeAsync(async () => await scannedDocument.UpdateScan());
+                }
                 RaisePropertyChanged(() => SelectedDocument);
             }
         }

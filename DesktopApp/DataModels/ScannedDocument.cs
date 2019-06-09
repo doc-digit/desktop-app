@@ -26,15 +26,12 @@ namespace DesktopApp.DataModels
 
         public ScannedDocument(int userId, int studentId, int documentId)
         {
-            if (UserId != userId || StudentId != studentId || DocumentId != documentId)
-            {
-                UserId = userId;
-                StudentId = studentId;
-                DocumentId = documentId;
-                if (consumer != null) consumer.Abort();
-                consumer = new Thread(Uploader);
-                consumer.Start();
-            }
+            UserId = userId;
+            StudentId = studentId;
+            DocumentId = documentId;
+            if (consumer != null) consumer.Abort();
+            consumer = new Thread(Uploader);
+            consumer.Start();
         }
 
         public async Task InitScan()
@@ -52,7 +49,24 @@ namespace DesktopApp.DataModels
                 Console.WriteLine(e.Message);
             }
         }
-            
+
+        public async Task UpdateScan()
+        {
+            try
+            {
+                var scanData = $"{{ \"user\": {UserId}, \"student\": {StudentId}, \"document_type\": {DocumentId}}}";
+                var response = await WebRequestHelper.PostAsync(ConfigurationManager.AppSettings["ApiUri"] + "/document/" + ScanId, scanData, "application/json", "PUT");
+
+                var definition = new { user = 0, student = 0, document_type = 0, id = "", created_date = "" };
+                ScanId = (JsonConvert.DeserializeAnonymousType(response, definition)).id;
+                Console.WriteLine("Updated scan doc: " + ScanId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
         public async Task CreatePDF(ObservableCollection<ImageSource> scans)
         {
             try
