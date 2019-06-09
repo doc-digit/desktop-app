@@ -299,16 +299,20 @@
                 <StackPanel Grid.Row="1">
                     <StackPanel VerticalAlignment="Top" Margin="10">
                         <Label Foreground="{DynamicResource grayBrush}" Background="{x:Null}" Content="Wybór skanera" FontSize="20" Margin="0"/>
-                        <ComboBox x:Name="SrcList" ItemsSource="{Binding DataSources}" SelectedItem="{Binding SelectedSource}" Height="46" BorderBrush="{DynamicResource grayBrush}">
+                        <ComboBox x:Name="SrcList" ItemsSource="{Binding DataSources}" SelectedItem="{Binding SelectedSource}" Height="46" BorderBrush="{DynamicResource grayBrush}" FontFamily="Roboto" FontSize="16">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap"></TextBlock>
+                                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap" FontFamily="Roboto"></TextBlock>
                                     </StackPanel>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <Button Content="Ustawienia skanera" Command="{Binding ShowDriverCommand}" Background="{DynamicResource NotSoWhite}" Template="{DynamicResource PlainButtonTemplate}" Height="46" Margin="0,5,0,0" FontFamily="Roboto" FontSize="14" BorderBrush="{DynamicResource grayBrush}"></Button>
+                        <Label Foreground="{DynamicResource grayBrush}" Background="{x:Null}" Content="DPI" FontSize="20" Margin="0, 10, 0, 0"/>
+                        <ComboBox x:Name="DPIList" ItemsSource="{Binding DPISources}" SelectedItem="{Binding SelectedDPI}" Height="46" BorderBrush="{DynamicResource grayBrush}" FontFamily="Roboto" FontSize="16"/>
+                        <Label Foreground="{DynamicResource grayBrush}" Background="{x:Null}" Content="Barwa" FontSize="20" Margin="0, 10, 0, 0"/>
+                        <ComboBox x:Name="DepthList" ItemsSource="{Binding DepthSources}" SelectedItem="{Binding SelectedDepth}" Height="46" BorderBrush="{DynamicResource grayBrush}" FontFamily="Roboto" FontSize="16"/>
+                        <Button Content="Otwórz ustawienia skanera" Command="{Binding ShowDriverCommand}" Background="{DynamicResource NotSoWhite}" Template="{DynamicResource PlainButtonTemplate}" Height="46" Margin="0,20,0,0" FontFamily="Roboto" FontSize="16" BorderBrush="{DynamicResource grayBrush}" FontWeight="Normal"></Button>
                     </StackPanel>
                 </StackPanel>
             </Grid>

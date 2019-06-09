@@ -7,6 +7,7 @@ using ModernWpf.Messages;
 using NTwain;
 using NTwain.Data;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -44,6 +45,8 @@ namespace DesktopApp
         #region properties
         private ScannedDocument scannedDocument;
         public ObservableCollection<DataSourceVM> DataSources { get; private set; }
+        public ObservableCollection<TWFix32> DPISources { get; private set; }
+        public ObservableCollection<PixelType> DepthSources { get; private set; }
 
         private ImageSource _selectedImage;
         public ImageSource SelectedImage
@@ -99,8 +102,9 @@ namespace DesktopApp
             }
         }
 
-         public ObservableCollection<DocType> _docTypes;
-        public ObservableCollection<DocType> DocTypes {
+        public ObservableCollection<DocType> _docTypes;
+        public ObservableCollection<DocType> DocTypes
+        {
             get { return _docTypes; }
             set
             {
@@ -110,7 +114,8 @@ namespace DesktopApp
         }
 
         public ObservableCollection<Student> _students;
-        public ObservableCollection<Student> Students {
+        public ObservableCollection<Student> Students
+        {
             get { return _students; }
             set
             {
@@ -134,7 +139,53 @@ namespace DesktopApp
                 if (_selectedSource != null)
                 {
                     _selectedSource.Open();
+                    var caps = session.CurrentSource.Capabilities;
+                    if (caps.ICapYResolution.IsSupported && caps.ICapXResolution.IsSupported)
+                    {
+                        DPISources = new ObservableCollection<TWFix32>(caps.ICapXResolution.GetValues().Where(dpi => (dpi % 50) == 0).ToList() as List<TWFix32>);
+                        RaisePropertyChanged(() => DPISources);
+                        var cur = caps.ICapXResolution.GetCurrent();
+                        if (DPISources.Contains(cur))
+                        {
+                            SelectedDPI = cur;
+                        }
+                    }
+                    if (caps.ICapPixelType.IsSupported)
+                    {
+                        DepthSources = new ObservableCollection<PixelType>(caps.ICapPixelType.GetValues().ToList() as List<PixelType>);
+                        RaisePropertyChanged(() => DepthSources);
+                        var cur = caps.ICapPixelType.GetCurrent();
+                        if (DepthSources.Contains(cur))
+                        {
+                            SelectedDepth = cur;
+                        }
+                    }
                 }
+            }
+        }
+
+        private TWFix32 _selectedDPI;
+        public TWFix32 SelectedDPI
+        {
+            get { return _selectedDPI; }
+            set
+            {
+                _selectedDPI = value;
+                session.CurrentSource.Capabilities.ICapXResolution.SetValue(value);
+                session.CurrentSource.Capabilities.ICapYResolution.SetValue(value);
+                RaisePropertyChanged(() => SelectedDPI);
+            }
+        }
+
+        private PixelType _selectedDepth;
+        public PixelType SelectedDepth
+        {
+            get { return _selectedDepth; }
+            set
+            {
+                _selectedDepth = value;
+                session.CurrentSource.Capabilities.ICapPixelType.SetValue(value);
+                RaisePropertyChanged(() => SelectedDepth);
             }
         }
 
@@ -251,10 +302,10 @@ namespace DesktopApp
                     CapturedImages[CapturedImages.IndexOf(SelectedImage)] = img;
                     SelectedImage = img;
                     ScannedDocument.UploadQueue.Add(img);
-                    }, () =>
-                {
-                    return _selectedImage != null;
-                }));
+                }, () =>
+            {
+                return _selectedImage != null;
+            }));
             }
         }
 
@@ -477,7 +528,7 @@ namespace DesktopApp
                         if (stream != null)
                         {
                             // file size
-                            img = stream.ConvertToWpfBitmap(1536, 0);
+                            img = stream.ConvertToWpfBitmap();
                         }
                     }
                     break;

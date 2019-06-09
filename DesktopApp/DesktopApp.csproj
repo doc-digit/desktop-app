@@ -119,6 +119,7 @@
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\CapVM.cs" />
     <Compile Include="ViewModels\DataSourceVM.cs" />
     <Compile Include="DataModels\DocType.cs" />
     <Compile Include="DataModels\Student.cs" />
