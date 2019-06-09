@@ -32,7 +32,7 @@ namespace DocDigitFinal
     /// </summary>
     public partial class MainWindow : Window
     {
-        TwainVM _twainVM;
+        TwainVM twainVM;
 
         public MainWindow(User user, ObservableCollection<DocType> docTypes)
         {
@@ -40,10 +40,10 @@ namespace DocDigitFinal
 
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                _twainVM = this.DataContext as TwainVM;
-                _twainVM.PropertyChanged += _twainVM_PropertyChanged;
-                _twainVM.CurrentUser = user;
-                _twainVM.DocTypes = docTypes;
+                twainVM = this.DataContext as TwainVM;
+                twainVM.PropertyChanged += TwainVM_PropertyChanged;
+                twainVM.CurrentUser = user;
+                twainVM.DocTypes = docTypes;
                 Messenger.Default.Register<RefreshCommandsMessage>(this, m => m.HandleIt());
                 Messenger.Default.Register<ChooseFileMessage>(this, m =>
                 {
@@ -66,26 +66,26 @@ namespace DocDigitFinal
             }
         }
 
-        private void _twainVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void TwainVM_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "State")
             {
-                if (_twainVM.State == 5)
+                if (twainVM.State == 5)
                 {
                     Theme.ApplyTheme(ThemeColor.Light, Accent.Orange);
                 }
-                else if (_twainVM.State == 4)
+                else if (twainVM.State == 4)
                 {
                     Theme.ApplyTheme(ThemeColor.Light, Accent.Gold);
                 }
             }
             if (e.PropertyName == "SelectedImage")
             {
-                if (_twainVM.CapturedImages.Count > 0)
+                if (twainVM.CapturedImages.Count > 0)
                 {
                     ImageControls.Visibility = Visibility.Visible;
                     SendButton.Visibility = Visibility.Visible;
-                    ScansListBox.ScrollIntoView(_twainVM.SelectedImage);
+                    ScansListBox.ScrollIntoView(twainVM.SelectedImage);
                 }
                 else
                 {
@@ -93,24 +93,35 @@ namespace DocDigitFinal
                     SendButton.Visibility = Visibility.Hidden;
                 }
             }
+            if (e.PropertyName == "Upload")
+            {
+                if (UploadingPDF.IsVisible)
+                {
+                    UploadingPDF.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    UploadingPDF.Visibility = Visibility.Visible;
+                }
+            }
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            e.Cancel = _twainVM.State > 4;
+            e.Cancel = twainVM.State > 4;
             base.OnClosing(e);
         }
         protected override void OnClosed(EventArgs e)
         {
             Messenger.Default.Unregister(this);
-            _twainVM.CloseDown();
+            twainVM.CloseDown();
             base.OnClosed(e);
         }
 
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-            _twainVM.WindowHandle = new WindowInteropHelper(this).Handle;
+            twainVM.WindowHandle = new WindowInteropHelper(this).Handle;
 
         }
 
@@ -121,7 +132,7 @@ namespace DocDigitFinal
             {
                 try
                 {
-                    _twainVM.Students = JsonConvert.DeserializeObject<ObservableCollection<Student>>(await WebRequestHelper.GetAsync(ConfigurationManager.AppSettings["ApiUri"] + $"/student/find?q={HttpUtility.UrlEncodeUnicode(student)}"));
+                    twainVM.Students = JsonConvert.DeserializeObject<ObservableCollection<Student>>(await WebRequestHelper.GetAsync(ConfigurationManager.AppSettings["ApiUri"] + $"/student/find?q={HttpUtility.UrlEncode(student)}"));
                 }
                 catch { }
             }

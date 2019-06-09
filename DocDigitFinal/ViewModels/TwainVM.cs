@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -29,15 +30,15 @@ namespace DocDigitFinal
 
             //this.SynchronizationContext = SynchronizationContext.Current;
             var appId = TWIdentity.CreateFromAssembly(DataGroups.Image | DataGroups.Audio, Assembly.GetEntryAssembly());
-            _session = new TwainSession(appId);
-            _session.TransferError += _session_TransferError;
-            _session.TransferReady += _session_TransferReady;
-            _session.DataTransferred += _session_DataTransferred;
-            _session.SourceDisabled += _session_SourceDisabled;
-            _session.StateChanged += (s, e) => { RaisePropertyChanged(() => State); };
+            session = new TwainSession(appId);
+            session.TransferError += Session_TransferError;
+            session.TransferReady += Session_TransferReady;
+            session.DataTransferred += Session_DataTransferred;
+            session.SourceDisabled += Session_SourceDisabled;
+            session.StateChanged += (s, e) => { RaisePropertyChanged(() => State); };
         }
 
-        TwainSession _session;
+        TwainSession session;
 
         #region properties
         private ScannedDocument scannedDocument;
@@ -61,6 +62,7 @@ namespace DocDigitFinal
             set
             {
                 _selectedStudent = value;
+                if (scannedDocument != null) scannedDocument.StudentId = _selectedStudent.id;
                 RaisePropertyChanged(() => SelectedStudent);
             }
         }
@@ -72,6 +74,7 @@ namespace DocDigitFinal
             set
             {
                 _selectedDocument = value;
+                if (scannedDocument != null) scannedDocument.DocumentId = _selectedDocument.id;
                 RaisePropertyChanged(() => SelectedDocument);
             }
         }
@@ -113,9 +116,9 @@ namespace DocDigitFinal
             get { return _selectedSource; }
             set
             {
-                if (_session.State == 4)
+                if (session.State == 4)
                 {
-                    _session.CurrentSource.Close();
+                    session.CurrentSource.Close();
                 }
                 _selectedSource = value;
                 RaisePropertyChanged(() => SelectedSource);
@@ -126,7 +129,7 @@ namespace DocDigitFinal
             }
         }
 
-        public int State { get { return _session.State; } }
+        public int State { get { return session.State; } }
 
         private IntPtr _winHandle;
         public IntPtr WindowHandle
@@ -141,7 +144,7 @@ namespace DocDigitFinal
                 }
                 else
                 {
-                    var rc = _session.Open(new WpfMessageLoopHook(value));
+                    var rc = session.Open(new WpfMessageLoopHook(value));
 
                     if (rc == ReturnCode.Success)
                     {
@@ -164,13 +167,13 @@ namespace DocDigitFinal
             {
                 return _showDriverCommand ?? (_showDriverCommand = new RelayCommand(() =>
                 {
-                    if (_session.State == 4)
+                    if (session.State == 4)
                     {
-                        var rc = _session.CurrentSource.Enable(SourceEnableMode.ShowUIOnly, false, WindowHandle);
+                        var rc = session.CurrentSource.Enable(SourceEnableMode.ShowUIOnly, false, WindowHandle);
                     }
                 }, () =>
                 {
-                    return _session.State == 4 && _session.CurrentSource.Capabilities.CapEnableDSUIOnly.GetCurrent() == BoolType.True;
+                    return session.State == 4 && session.CurrentSource.Capabilities.CapEnableDSUIOnly.GetCurrent() == BoolType.True;
                 }));
             }
         }
@@ -182,13 +185,13 @@ namespace DocDigitFinal
             {
                 return _captureCommand ?? (_captureCommand = new RelayCommand(() =>
                 {
-                    if (_session.State == 4)
+                    if (session.State == 4)
                     {
-                        var rc = _session.CurrentSource.Enable(ShowUI ? SourceEnableMode.ShowUI : SourceEnableMode.NoUI, false, WindowHandle);
+                        var rc = session.CurrentSource.Enable(ShowUI ? SourceEnableMode.ShowUI : SourceEnableMode.NoUI, false, WindowHandle);
                     }
                 }, () =>
                 {
-                    return _session.State == 4;
+                    return session.State == 4;
                 }));
             }
         }
@@ -216,14 +219,14 @@ namespace DocDigitFinal
                 return _reloadSrc ?? (_reloadSrc = new RelayCommand(() =>
                 {
                     DataSources.Clear();
-                    foreach (var s in _session.Select(s => new DataSourceVM { DS = s }))
+                    foreach (var s in session.Select(s => new DataSourceVM { DS = s }))
                     {
                         DataSources.Add(s);
                     }
                     if (DataSources.Count > 0) SelectedSource = DataSources[0];
                 }, () =>
                 {
-                    return _session.State > 2;
+                    return session.State > 2;
                 }));
             }
         }
@@ -331,13 +334,23 @@ namespace DocDigitFinal
             {
                 return _sendCommand ?? (_sendCommand = new RelayCommand(async () =>
                 {
-                    // Confirming upload
-                    await scannedDocument.Upload();
-                    CapturedImages.Clear();
-                    scannedDocument = null;
+                    string messageBoxText = "Czy zakończyć skanowanie i przesłać dokument?";
+                    string caption = "Zakończ skanowanie";
+                    MessageBoxButton button = MessageBoxButton.YesNo;
+                    MessageBoxImage icon = MessageBoxImage.Warning;
+                    var result = MessageBox.Show(messageBoxText, caption, button, icon);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        RaisePropertyChanged("Upload");
+                        await scannedDocument.CreatePDF(CapturedImages);
+                        CapturedImages.Clear();
+                        scannedDocument = null;
+                        RaisePropertyChanged("Upload");
+                    }
                 }, () =>
                 {
-                    IsSendVisible = CapturedImages != null && SelectedStudent != null && SelectedDocument != null;
+                    IsSendVisible = CapturedImages != null && CapturedImages.Count > 0 && SelectedStudent != null && SelectedDocument != null;
+                    if (IsSendVisible && scannedDocument == null) scannedDocument = new ScannedDocument(CurrentUser.id, SelectedStudent.id, SelectedDocument.id);
                     return IsSendVisible;
                 }));
             }
@@ -367,15 +380,14 @@ namespace DocDigitFinal
             }
         }
 
-
         #endregion
 
-        void _session_SourceDisabled(object sender, EventArgs e)
+        void Session_SourceDisabled(object sender, EventArgs e)
         {
             Messenger.Default.Send(new RefreshCommandsMessage());
         }
 
-        void _session_TransferError(object sender, TransferErrorEventArgs e)
+        void Session_TransferError(object sender, TransferErrorEventArgs e)
         {
             App.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -400,12 +412,12 @@ namespace DocDigitFinal
             }));
         }
 
-        void _session_TransferReady(object sender, TransferReadyEventArgs e)
+        void Session_TransferReady(object sender, TransferReadyEventArgs e)
         {
-            var mech = _session.CurrentSource.Capabilities.ICapXferMech.GetCurrent();
+            var mech = session.CurrentSource.Capabilities.ICapXferMech.GetCurrent();
             if (mech == XferMech.File)
             {
-                var formats = _session.CurrentSource.Capabilities.ICapImageFileFormat.GetValues();
+                var formats = session.CurrentSource.Capabilities.ICapImageFileFormat.GetValues();
                 var wantFormat = formats.Contains(FileFormat.Tiff) ? FileFormat.Tiff : FileFormat.Bmp;
 
                 var fileSetup = new TWSetupFileXfer
@@ -413,7 +425,7 @@ namespace DocDigitFinal
                     Format = wantFormat,
                     FileName = GetUniqueName(Path.GetTempPath(), "twain-test", "." + wantFormat)
                 };
-                var rc = _session.CurrentSource.DGControl.SetupFileXfer.Set(fileSetup);
+                session.CurrentSource.DGControl.SetupFileXfer.Set(fileSetup);
             }
         }
 
@@ -428,28 +440,19 @@ namespace DocDigitFinal
             return filePath;
         }
 
-        void _session_DataTransferred(object sender, DataTransferredEventArgs e)
+        void Session_DataTransferred(object sender, DataTransferredEventArgs e)
         {
             ImageSource img = GenerateThumbnail(e);
             if (img != null)
             {
-                App.Current.Dispatcher.BeginInvoke(new Action(async () =>
+                App.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     CapturedImages.Add(img);
                     SelectedImage = img;
-                    if (IsSendVisible && scannedDocument == null)
-                    {
-                        scannedDocument = new ScannedDocument(CurrentUser.id, SelectedStudent.id, SelectedDocument.id);
-                        await scannedDocument.InitScan();
-                    }
-                    if (scannedDocument != null)
-                    {
-                        await scannedDocument.AddPage(img);
-                    }
+                    ScannedDocument.UploadQueue.Add(img);
                 }));
             }
         }
-
 
         ImageSource GenerateThumbnail(DataTransferredEventArgs e)
         {
@@ -483,11 +486,11 @@ namespace DocDigitFinal
 
         internal void CloseDown()
         {
-            if (_session.State == 4)
+            if (session.State == 4)
             {
-                _session.CurrentSource.Close();
+                session.CurrentSource.Close();
             }
-            _session.Close();
+            session.Close();
         }
     }
 }
