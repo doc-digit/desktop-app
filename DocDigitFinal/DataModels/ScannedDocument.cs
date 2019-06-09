@@ -89,12 +89,15 @@ namespace DocDigitFinal.DataModels
                         var respObj = JsonConvert.DeserializeAnonymousType(response, definition);
                         ScannedPages.Add(new ScannedPage(respObj.id, img, false));
 
-                        using (var fileStream = new FileStream("tmp.png", FileMode.Create))
+                        App.Current.Dispatcher.Invoke(() =>
                         {
-                            BitmapEncoder encoder = new PngBitmapEncoder();
-                            encoder.Frames.Add(BitmapFrame.Create((BitmapSource)img));
-                            encoder.Save(fileStream);
-                        }
+                            using (var fileStream = new FileStream("tmp.png", FileMode.Create))
+                            {
+                                BitmapEncoder encoder = new PngBitmapEncoder();
+                                encoder.Frames.Add(BitmapFrame.Create((BitmapSource)img));
+                                encoder.Save(fileStream);
+                            }
+                        });
 
                         var wc = new WebClient();
                         var png = File.ReadAllBytes("tmp.png");

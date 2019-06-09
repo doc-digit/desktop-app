@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -241,7 +242,8 @@ namespace DocDigitFinal
                     TransformedBitmap img = new TransformedBitmap((BitmapSource)SelectedImage, new RotateTransform(-90));
                     CapturedImages[CapturedImages.IndexOf(SelectedImage)] = img;
                     SelectedImage = img;
-                }, () =>
+                    ScannedDocument.UploadQueue.Add(img);
+                    }, () =>
                 {
                     return _selectedImage != null;
                 }));
@@ -258,6 +260,7 @@ namespace DocDigitFinal
                     TransformedBitmap img = new TransformedBitmap((BitmapSource)SelectedImage, new RotateTransform(90));
                     CapturedImages[CapturedImages.IndexOf(SelectedImage)] = img;
                     SelectedImage = img;
+                    ScannedDocument.UploadQueue.Add(img);
                 }, () =>
                 {
                     return _selectedImage != null;
