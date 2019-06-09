@@ -1,99 +1,99 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="DesktopApp.App" Collapsed="true">
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="DesktopApp.App">
     <Position X="0.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>App.xaml.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.LoginWindow" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="0.5" Y="1.5" Width="1.5" />
+  <Class Name="DesktopApp.LoginWindow" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACABAAAAAAAAAAAAAAAAEAAAAAAAAAAACAAAAAAAA=</HashCode>
       <FileName>LoginWindow.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="DesktopApp.MainWindow" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="2.25" Y="1.5" Width="1.5" />
+  <Class Name="DesktopApp.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAhBAAAAAAAAAAAAAggkAAAAAAAAAAggACAAAAAA=</HashCode>
       <FileName>MainWindow.xaml.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="DesktopApp.CapVM" Collapsed="true">
+  <Class Name="DesktopApp.CapVM">
     <Position X="2.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACEgAAAAAQABABEAAAgAAQAACAAAAAAAAAAAAAABAA=</HashCode>
       <FileName>ViewModels\CapVM.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.DataSourceVM" Collapsed="true">
+  <Class Name="DesktopApp.DataSourceVM">
     <Position X="4" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>IAAAABhCAAAAIAAAAAAAAARAAAAAAAAAAAAAAQCAAAA=</HashCode>
       <FileName>ViewModels\DataSourceVM.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.TwainVM" Collapsed="true">
-    <Position X="5.75" Y="2.5" Width="1.5" />
+  <Class Name="DesktopApp.TwainVM">
+    <Position X="5.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>gIIAEAIAAMEVIAKENMMQAgQAFAgAAQkQLhBvThgACSA=</HashCode>
       <FileName>ViewModels\TwainVM.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.ViewModels.DocType" Collapsed="true">
-    <Position X="5.75" Y="0.5" Width="1.5" />
+  <Class Name="DesktopApp.ViewModels.DocType">
+    <Position X="2.25" Y="11" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAEAAAAAAAAAAAAAgA=</HashCode>
       <FileName>DataModels\DocType.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.ViewModels.Student" Collapsed="true">
-    <Position X="4" Y="2.5" Width="1.5" />
+  <Class Name="DesktopApp.ViewModels.Student">
+    <Position X="2.25" Y="6.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAEAgAAAAAAAAAAEACAAAAAEAAAAAAAAAAABAgA=</HashCode>
       <FileName>DataModels\Student.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.ViewModels.User" Collapsed="true">
-    <Position X="0.5" Y="3.5" Width="1.5" />
+  <Class Name="DesktopApp.ViewModels.User">
+    <Position X="0.5" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAgA=</HashCode>
       <FileName>DataModels\User.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.DataModels.ScannedDocument" Collapsed="true">
-    <Position X="5.75" Y="1.5" Width="1.5" />
+  <Class Name="DesktopApp.DataModels.ScannedDocument">
+    <Position X="4" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AIAAAIgAAAAAAEAAQAAAIAgQAAAAAAIAAAAAAQACAAA=</HashCode>
       <FileName>DataModels\ScannedDocument.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.DataModels.ScannedPage" Collapsed="true">
-    <Position X="0.5" Y="2.5" Width="1.5" />
+  <Class Name="DesktopApp.DataModels.ScannedPage">
+    <Position X="0.5" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AIQCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DataModels\ScannedPage.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.Helpers.WebRequestHelper" Collapsed="true">
-    <Position X="2.25" Y="3.5" Width="1.5" />
+  <Class Name="DesktopApp.Helpers.WebRequestHelper">
+    <Position X="2.25" Y="9.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAgAAAAAAAAAAAAAACAAAAAAAAAAAIAAAAAA=</HashCode>
       <FileName>Helpers\WebRequestHelper.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.Properties.Resources" Collapsed="true">
-    <Position X="4" Y="1.5" Width="1.5" />
+  <Class Name="DesktopApp.Properties.Resources">
+    <Position X="4" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
     </TypeIdentifier>
   </Class>
-  <Class Name="DesktopApp.Properties.Settings" Collapsed="true">
-    <Position X="2.25" Y="2.5" Width="1.5" />
+  <Class Name="DesktopApp.Properties.Settings">
+    <Position X="2.25" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
     </TypeIdentifier>
