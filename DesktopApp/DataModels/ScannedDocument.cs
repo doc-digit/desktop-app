@@ -110,6 +110,7 @@ namespace DesktopApp.DataModels
                         var wc = new WebClient();
                         var png = File.ReadAllBytes("tmp.png");
                         wc.UploadData(respObj.url, "PUT", png);
+                        File.Delete("tmp.png");
                         ScannedPages.Find((k) => k.Scan == img).IsUploaded = true;
                         Console.WriteLine($"Uploaded: {respObj.id}");
                     }
